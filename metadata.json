@@ -1,0 +1,6 @@
+{
+  "name": "Kronas Play - Игры и Софт",
+  "description": "Официальный сайт Kronas Play: игры и программы для Windows ПК и Android с быстрым скачиванием",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
