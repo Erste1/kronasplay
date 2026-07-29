@@ -40,14 +40,6 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
   onDeleteReview,
   isAdmin = false
 }) => {
-  useEffect(() => {
-    if (project) {
-      trackEvent('Просмотр', `Просмотр карточки: "${project.title}" (${project.type.toUpperCase()})`);
-    }
-  }, [project]);
-
-  if (!project) return null;
-
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [newReviewName, setNewReviewName] = useState('');
   const [newReviewText, setNewReviewText] = useState('');
@@ -59,11 +51,32 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
   const [editRating, setEditRating] = useState(5);
   const [editComment, setEditComment] = useState('');
 
+  useEffect(() => {
+    setActiveImageIndex(0);
+    if (project) {
+      trackEvent('Просмотр', `Просмотр карточки: "${project.title}" (${project.type.toUpperCase()})`);
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [project, onClose]);
+
+  if (!project) return null;
+
   const projectReviews = reviews.filter(r => r.projectId === project.id);
 
-  const images = project.screenshots && project.screenshots.length > 0 
+  const rawImages = project.screenshots && project.screenshots.length > 0 
     ? project.screenshots 
     : [project.bannerUrl];
+  
+  const images = rawImages.filter(Boolean).length > 0 ? rawImages.filter(Boolean) : [project.bannerUrl];
+  const safeImageIndex = activeImageIndex >= images.length ? 0 : activeImageIndex;
+  const currentImageUrl = images[safeImageIndex] || project.bannerUrl;
 
   const handleAddReview = (e: React.FormEvent) => {
     e.preventDefault();
