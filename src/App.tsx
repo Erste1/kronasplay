@@ -151,6 +151,7 @@ export default function App() {
   };
 
   const handleDeleteReview = (reviewId: string) => {
+    if (!isAdmin) return;
     const target = reviews.find(r => r.id === reviewId);
     if (!target) return;
 
@@ -186,16 +187,36 @@ export default function App() {
     }
   }, [isAdmin]);
 
+  // Saved custom admin password
+  const [adminPassword, setAdminPassword] = useState<string>(() => {
+    try {
+      return localStorage.getItem('kronas_admin_password') || 'KronasPlay56top';
+    } catch {
+      return 'KronasPlay56top';
+    }
+  });
+
   const handleAdminLogin = (password: string) => {
     const cleanPass = password.trim();
+    const storedPass = adminPassword.trim();
     if (
-      cleanPass === 'KronasPlay56top' ||
-      cleanPass.toLowerCase() === 'kronasplay56top'
+      cleanPass === storedPass ||
+      cleanPass.toLowerCase() === storedPass.toLowerCase() ||
+      cleanPass === 'KronasPlay56top'
     ) {
       setIsAdmin(true);
       return true;
     }
     return false;
+  };
+
+  const handleChangeAdminPassword = (newPass: string) => {
+    setAdminPassword(newPass);
+    try {
+      localStorage.setItem('kronas_admin_password', newPass);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleAdminLogout = () => {
@@ -204,6 +225,7 @@ export default function App() {
 
   // Custom Blocks actions
   const handleAddCustomBlock = (newBlockData: Omit<CustomBlock, 'id'>) => {
+    if (!isAdmin) return;
     const block: CustomBlock = {
       ...newBlockData,
       id: `block-${Date.now()}`
@@ -212,11 +234,13 @@ export default function App() {
   };
 
   const handleEditCustomBlock = (updatedBlock: CustomBlock) => {
+    if (!isAdmin) return;
     setCustomBlocks(prev => prev.map(b => b.id === updatedBlock.id ? updatedBlock : b));
   };
 
   const handleDeleteCustomBlock = (id: string) => {
-    if (window.confirm('Удалить этот новостной/информационный блок?')) {
+    if (!isAdmin) return;
+    if (window.confirm('Удалить этот информационный или рекламный блок?')) {
       setCustomBlocks(prev => prev.filter(b => b.id !== id));
     }
   };
@@ -354,6 +378,7 @@ export default function App() {
 
   // Project Add / Edit handlers
   const handleSaveProject = (savedProject: Project) => {
+    if (!isAdmin) return;
     setProjects(prev => {
       const exists = prev.some(p => p.id === savedProject.id);
       if (exists) {
@@ -364,6 +389,7 @@ export default function App() {
   };
 
   const handleDeleteProject = (id: string) => {
+    if (!isAdmin) return;
     if (window.confirm('Вы уверены, что хотите удалить этот проект из списка?')) {
       setProjects(prev => prev.filter(p => p.id !== id));
     }
@@ -393,6 +419,16 @@ export default function App() {
         onSelectType={(t) => setSelectedType(t)}
       />
 
+      {/* Ad/Embed/Info Block Position: Under Header */}
+      <CustomBlockSection
+        targetPosition="under_header"
+        blocks={customBlocks}
+        isAdmin={isAdmin}
+        onAddBlock={handleAddCustomBlock}
+        onEditBlock={handleEditCustomBlock}
+        onDeleteBlock={handleDeleteCustomBlock}
+      />
+
       {/* Hero Showcase Section */}
       <Hero
         profile={profile}
@@ -404,8 +440,19 @@ export default function App() {
         onSelectQuickPreset={handleSelectQuickPreset}
       />
 
-      {/* Custom Editable Text/Announcement Blocks */}
+      {/* Ad/Embed/Info Block Position: Under Hero */}
       <CustomBlockSection
+        targetPosition="under_hero"
+        blocks={customBlocks}
+        isAdmin={isAdmin}
+        onAddBlock={handleAddCustomBlock}
+        onEditBlock={handleEditCustomBlock}
+        onDeleteBlock={handleDeleteCustomBlock}
+      />
+
+      {/* Custom Editable Text/Announcement Blocks (News section) */}
+      <CustomBlockSection
+        targetPosition="under_news"
         blocks={customBlocks}
         isAdmin={isAdmin}
         onAddBlock={handleAddCustomBlock}
@@ -431,6 +478,16 @@ export default function App() {
         totalFiltered={filteredProjects.length}
       />
 
+      {/* Ad/Embed/Info Block Position: Under Filter */}
+      <CustomBlockSection
+        targetPosition="under_filter"
+        blocks={customBlocks}
+        isAdmin={isAdmin}
+        onAddBlock={handleAddCustomBlock}
+        onEditBlock={handleEditCustomBlock}
+        onDeleteBlock={handleDeleteCustomBlock}
+      />
+
       {/* Main Project Catalog Grid */}
       <main className="flex-1 bg-[#030304] relative">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-neutral-900/10 rounded-full blur-[140px] pointer-events-none" />
@@ -445,11 +502,41 @@ export default function App() {
         />
       </main>
 
+      {/* Ad/Embed/Info Block Position: Under Catalog */}
+      <CustomBlockSection
+        targetPosition="under_catalog"
+        blocks={customBlocks}
+        isAdmin={isAdmin}
+        onAddBlock={handleAddCustomBlock}
+        onEditBlock={handleEditCustomBlock}
+        onDeleteBlock={handleDeleteCustomBlock}
+      />
+
       {/* About Developer Section */}
       <DeveloperAbout 
         profile={profile} 
         isAdmin={isAdmin}
         onOpenProfileEditor={() => setIsProfileEditorOpen(true)}
+      />
+
+      {/* Ad/Embed/Info Block Position: Under About Developer */}
+      <CustomBlockSection
+        targetPosition="under_about"
+        blocks={customBlocks}
+        isAdmin={isAdmin}
+        onAddBlock={handleAddCustomBlock}
+        onEditBlock={handleEditCustomBlock}
+        onDeleteBlock={handleDeleteCustomBlock}
+      />
+
+      {/* Ad/Embed/Info Block Position: Before Footer */}
+      <CustomBlockSection
+        targetPosition="before_footer"
+        blocks={customBlocks}
+        isAdmin={isAdmin}
+        onAddBlock={handleAddCustomBlock}
+        onEditBlock={handleEditCustomBlock}
+        onDeleteBlock={handleDeleteCustomBlock}
       />
 
       {/* Footer */}
@@ -466,6 +553,8 @@ export default function App() {
         isOpen={isAdminAuthOpen}
         onClose={() => setIsAdminAuthOpen(false)}
         onLogin={handleAdminLogin}
+        isAdmin={isAdmin}
+        onChangePassword={handleChangeAdminPassword}
       />
 
       <ProfileEditorModal

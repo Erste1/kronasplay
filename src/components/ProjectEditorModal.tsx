@@ -15,8 +15,6 @@ export const ProjectEditorModal: React.FC<ProjectEditorModalProps> = ({
   onSave,
   onClose
 }) => {
-  if (!isOpen) return null;
-
   const [title, setTitle] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [fullDescription, setFullDescription] = useState('');
@@ -33,6 +31,7 @@ export const ProjectEditorModal: React.FC<ProjectEditorModalProps> = ({
   const [downloadUrlApk, setDownloadUrlApk] = useState('');
 
   useEffect(() => {
+    if (!isOpen) return;
     if (projectToEdit) {
       setTitle(projectToEdit.title);
       setShortDescription(projectToEdit.shortDescription);
@@ -66,6 +65,8 @@ export const ProjectEditorModal: React.FC<ProjectEditorModalProps> = ({
       setDownloadUrlApk('');
     }
   }, [projectToEdit, isOpen]);
+
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

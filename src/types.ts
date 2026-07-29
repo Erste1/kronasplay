@@ -63,11 +63,31 @@ export interface DeveloperProfile {
   heroSubtitle?: string;
 }
 
+export type BlockPosition = 
+  | 'under_header'
+  | 'under_hero'
+  | 'under_news'
+  | 'under_filter'
+  | 'under_catalog'
+  | 'under_about'
+  | 'before_footer';
+
+export type BlockType = 
+  | 'announcement'
+  | 'info'
+  | 'warning'
+  | 'ad_banner'
+  | 'embed_code';
+
 export interface CustomBlock {
   id: string;
   title: string;
   content: string;
-  type: 'announcement' | 'info' | 'warning';
+  type: BlockType;
+  position?: BlockPosition;
   date: string;
+  targetUrl?: string;
+  imageUrl?: string;
+  hideTitle?: boolean;
 }
 

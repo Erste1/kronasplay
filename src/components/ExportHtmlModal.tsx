@@ -15,9 +15,9 @@ export const ExportHtmlModal: React.FC<ExportHtmlModalProps> = ({
   profile,
   onClose
 }) => {
-  if (!isOpen) return null;
-
   const [copied, setCopied] = useState(false);
+
+  if (!isOpen) return null;
 
   // Generate self-contained standalone single HTML document
   const generateStandaloneHtml = (): string => {

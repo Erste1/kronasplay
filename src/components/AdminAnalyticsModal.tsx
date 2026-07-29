@@ -30,8 +30,6 @@ export const AdminAnalyticsModal: React.FC<AdminAnalyticsModalProps> = ({
   const [filterAction, setFilterAction] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  if (!isOpen) return null;
-
   const handleRefresh = () => {
     setEvents(getAnalyticsEvents());
   };
@@ -64,6 +62,8 @@ export const AdminAnalyticsModal: React.FC<AdminAnalyticsModalProps> = ({
   const totalDownloads = events.filter(e => e.action === 'Скачивание').length;
   const totalViews = events.filter(e => e.action === 'Просмотр').length;
   const totalSearches = events.filter(e => e.action === 'Поиск').length;
+
+  if (!isOpen) return null;
 
   const getActionBadgeClass = (action: string) => {
     switch (action) {
